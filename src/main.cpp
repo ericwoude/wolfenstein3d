@@ -4,20 +4,20 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2022 Eric van der Woude
+ * Cop.yright © 2022 Eric van der Woude
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the “Software”), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * Permission is hereby granted, free of charge, to any person obtaining a cop.y of this software
+ * and associated documentation files (the “Software”), to deal in the Software without restriction,
+ * including without limitation the rights to use, cop.y, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or
+ * The above cop.yright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COp.yRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
@@ -31,8 +31,8 @@
 #include "player.h"
 #include "utility.h"
 
-#define MAP_WIDTH 12
-#define MAP_HEIGHT 12
+#define MAP_WIDTH 8
+#define MAP_HEIGHT 8
 
 #define MAX_DEPTH std::max(MAP_WIDTH, MAP_HEIGHT)
 
@@ -50,11 +50,11 @@ level world(MAP_WIDTH, MAP_HEIGHT);
 
 void draw_scene()
 {
-    const int fov = 80;
+    const int fov = 60;
     int depth;
     int pos;
 
-    double d_vertical, d_horizontal, d_min;
+    double d_vertical, d_horizontal;
     double r_angle = clamp_to_unit_circle(p.angle + (fov / 2));
 
     // Vertical vector and horizontal vector
@@ -111,8 +111,7 @@ void draw_scene()
             if (pos > 0 && pos < world.width * world.height && world[pos] == 1)  // Hit
             {
                 depth = MAX_DEPTH;
-                d_vertical = cos(degrees_to_radians(p.angle)) * (vx - p.x) -
-                             sin(degrees_to_radians(p.angle)) * (vy - p.y);
+                d_vertical = cos(theta) * (vx - p.x) - sin(theta) * (vy - p.y);
             }
             else
             {
@@ -134,7 +133,7 @@ void draw_scene()
         depth = 0;
         d_horizontal = infinity;
 
-        if (sin(degrees_to_radians(r_angle)) > epsilon)  // Points up
+        if (sin(theta) > epsilon)  // Points up
         {
             hy = (((int)p.y >> 6) << 6) - epsilon;
             hx = (p.y - hy) * tangent + p.x;
@@ -142,7 +141,7 @@ void draw_scene()
             ox = 64 * tangent;
             oy = -64;
         }
-        else if (sin(degrees_to_radians(r_angle)) < -epsilon)  // Points down
+        else if (sin(theta) < -epsilon)  // Points down
         {
             hy = (((int)p.y >> 6) << 6) + 64;
             hx = (p.y - hy) * tangent + p.x;
@@ -166,8 +165,7 @@ void draw_scene()
             if (pos > 0 && pos < world.width * world.height && world[pos] == 1)  // Hit
             {
                 depth = MAX_DEPTH;
-                d_horizontal = cos(degrees_to_radians(p.angle)) * (hx - p.x) -
-                               sin(degrees_to_radians(p.angle)) * (hy - p.y);
+                d_horizontal = cos(theta) * (hx - p.x) - sin(theta) * (hy - p.y);
             }
             else
             {

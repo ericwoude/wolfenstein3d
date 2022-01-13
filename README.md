@@ -5,7 +5,7 @@
 A reimpementation of the renderer of Wolfenstein3D.
 
 ## Requirements
-This project requires an installation of OpenGL and GLUT. The following command can be used to install the dependences on a debian based system:
+This project requires an installation of OpenGL and GLUT. The following command can be used to install the dependencies on a ubuntu based system:
 ```bash
 $ sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 ```
