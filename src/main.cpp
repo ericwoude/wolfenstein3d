@@ -36,8 +36,8 @@
 
 #define MAX_DEPTH std::max(MAP_WIDTH, MAP_HEIGHT)
 
-#define SCREEN_WIDTH 600
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 400
 
 const int window = 1;
 
@@ -50,12 +50,11 @@ level world(MAP_WIDTH, MAP_HEIGHT);
 
 void draw_scene()
 {
-    const int fov = 60;
     int depth;
     int pos;
 
     double d_vertical, d_horizontal;
-    double r_angle = clamp_to_unit_circle(p.angle + (fov / 2));
+    double r_angle = clamp_to_unit_circle(p.angle + 30);
 
     // Vertical vector and horizontal vector
     double vx, vy;
@@ -64,7 +63,7 @@ void draw_scene()
     // Offset vector
     double ox, oy;
 
-    for (int ray = 0; ray < fov; ray++)
+    for (int ray = 0; ray < 120; ray++)
     {
         double theta = degrees_to_radians(r_angle);
         double tangent = tan(theta);
@@ -193,8 +192,9 @@ void draw_scene()
 
         // Draw walls
         d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(p.angle - r_angle)));
-        double wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
-        double offset = (SCREEN_HEIGHT / 2) - (wall_height / 2);
+        int wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
+        wall_height = (wall_height > SCREEN_HEIGHT) ? SCREEN_HEIGHT : wall_height;
+        int offset = (SCREEN_HEIGHT / 2) - (wall_height >> 1);
 
         glLineWidth(8);
         glBegin(GL_LINES);
@@ -202,7 +202,7 @@ void draw_scene()
         glVertex2i(ray * 8, wall_height + offset);
         glEnd();
 
-        r_angle = clamp_to_unit_circle(r_angle - 1);
+        r_angle = clamp_to_unit_circle(r_angle - 0.5);
     }
 }
 
