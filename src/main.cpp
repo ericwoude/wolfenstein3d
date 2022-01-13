@@ -4,20 +4,20 @@
  *
  * The MIT License (MIT)
  *
- * Cop.yright © 2022 Eric van der Woude
+ * Copyright © 2022 Eric van der Woude
  *
- * Permission is hereby granted, free of charge, to any person obtaining a cop.y of this software
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the “Software”), to deal in the Software without restriction,
- * including without limitation the rights to use, cop.y, modify, merge, publish, distribute,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
  * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above cop.yright notice and this permission notice shall be included in all copies or
+ * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
  * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COp.yRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COpyRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
@@ -27,22 +27,25 @@
 #include <cmath>
 #include <iostream>
 
-#include "level.h"
-#include "player.h"
-#include "utility.h"
+#include "game.h"
 
-#define MAP_WIDTH 8
-#define MAP_HEIGHT 8
-
-#define MAX_DEPTH std::max(MAP_WIDTH, MAP_HEIGHT)
+///////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+///////////////////////////////////////////////////////////////////////////////
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 400
 
-const int window = 1;
+///////////////////////////////////////////////////////////////////////////////
+// VARIABLES
+///////////////////////////////////////////////////////////////////////////////
 
-player p(150, 150);
-level world(MAP_WIDTH, MAP_HEIGHT);
+double old_time_since_frame;
+double time_since_frame;
+double delta_time;
+
+game g;
+const int window_id = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
 // DRAWING FUNCTIONS
@@ -53,8 +56,11 @@ void draw_scene()
     int depth;
     int pos;
 
+    double px = g.p.x, py = g.p.y;
+    double pa = g.p.angle;
+
     double d_vertical, d_horizontal;
-    double r_angle = clamp_to_unit_circle(p.angle + 30);
+    double r_angle = clamp_to_unit_circle(pa + 30);
 
     // Vertical vector and horizontal vector
     double vx, vy;
@@ -80,24 +86,24 @@ void draw_scene()
 
         if (cos(theta) > epsilon)  // Points left
         {
-            vx = (((int)p.x >> 6) << 6) + 64;
-            vy = (p.x - vx) * tangent + p.y;
+            vx = (((int)px >> 6) << 6) + 64;
+            vy = (px - vx) * tangent + py;
 
             ox = 64;
             oy = -64 * tangent;
         }
         else if (cos(theta) < -epsilon)  // Points right
         {
-            vx = (((int)p.x >> 6) << 6) - epsilon;
-            vy = (p.x - vx) * tangent + p.y;
+            vx = (((int)px >> 6) << 6) - epsilon;
+            vy = (px - vx) * tangent + py;
 
             ox = -64;
             oy = 64 * tangent;
         }
         else  // Points straight up or down, no hit
         {
-            vx = p.x;
-            vy = p.y;
+            vx = px;
+            vy = py;
 
             depth = MAX_DEPTH;
         }
@@ -105,12 +111,12 @@ void draw_scene()
         while (depth < MAX_DEPTH)
         {
             // Position relative to the grid
-            pos = ((int)(vy) >> 6) * world.width + ((int)(vx) >> 6);
+            pos = ((int)(vy) >> 6) * g.world.width + ((int)(vx) >> 6);
 
-            if (pos > 0 && pos < world.width * world.height && world[pos] == 1)  // Hit
+            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] == 1)  // Hit
             {
                 depth = MAX_DEPTH;
-                d_vertical = cos(theta) * (vx - p.x) - sin(theta) * (vy - p.y);
+                d_vertical = cos(theta) * (vx - px) - sin(theta) * (vy - py);
             }
             else
             {
@@ -134,24 +140,24 @@ void draw_scene()
 
         if (sin(theta) > epsilon)  // Points up
         {
-            hy = (((int)p.y >> 6) << 6) - epsilon;
-            hx = (p.y - hy) * tangent + p.x;
+            hy = (((int)py >> 6) << 6) - epsilon;
+            hx = (py - hy) * tangent + px;
 
             ox = 64 * tangent;
             oy = -64;
         }
         else if (sin(theta) < -epsilon)  // Points down
         {
-            hy = (((int)p.y >> 6) << 6) + 64;
-            hx = (p.y - hy) * tangent + p.x;
+            hy = (((int)py >> 6) << 6) + 64;
+            hx = (py - hy) * tangent + px;
 
             ox = -64 * tangent;
             oy = 64;
         }
         else  // Points straight left or right, no hit
         {
-            hx = p.x;
-            hy = p.y;
+            hx = px;
+            hy = py;
 
             depth = MAX_DEPTH;
         }
@@ -159,12 +165,12 @@ void draw_scene()
         while (depth < MAX_DEPTH)
         {
             // Position relative to the grid
-            pos = ((int)(hy) >> 6) * world.width + ((int)(hx) >> 6);
+            pos = ((int)(hy) >> 6) * g.world.width + ((int)(hx) >> 6);
 
-            if (pos > 0 && pos < world.width * world.height && world[pos] == 1)  // Hit
+            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] == 1)  // Hit
             {
                 depth = MAX_DEPTH;
-                d_horizontal = cos(theta) * (hx - p.x) - sin(theta) * (hy - p.y);
+                d_horizontal = cos(theta) * (hx - px) - sin(theta) * (hy - py);
             }
             else
             {
@@ -191,7 +197,7 @@ void draw_scene()
             glColor3f(0.7, 0, 0);
 
         // Draw walls
-        d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(p.angle - r_angle)));
+        d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(pa - r_angle)));
         int wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
         wall_height = (wall_height > SCREEN_HEIGHT) ? SCREEN_HEIGHT : wall_height;
         int offset = (SCREEN_HEIGHT / 2) - (wall_height >> 1);
@@ -204,37 +210,23 @@ void draw_scene()
 
         r_angle = clamp_to_unit_circle(r_angle - 0.5);
     }
+
+    glutPostRedisplay();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLUT HOOKS
 ///////////////////////////////////////////////////////////////////////////////
 
-void buttons(unsigned char key, int x, int y)
+void button_down(unsigned char key, int x, int y)
 {
     switch (key)
     {
-        case 'w':
+        case 'w': g.keys.w = true; break;
+        case 's': g.keys.s = true; break;
+        case 27:
         {
-            double dx = cos(degrees_to_radians(p.angle));
-            double dy = -sin(degrees_to_radians(p.angle));
-            p.x += 5 * dx;
-            p.y += 5 * dy;
-        }
-        break;
-
-        case 's':
-        {
-            double dx = cos(degrees_to_radians(p.angle));
-            double dy = -sin(degrees_to_radians(p.angle));
-            p.x -= 5 * dx;
-            p.y -= 5 * dy;
-        }
-        break;
-
-        case 27:  // Escape key
-        {
-            glutDestroyWindow(window);
+            glutDestroyWindow(window_id);
             exit(0);
         }
         break;
@@ -243,9 +235,13 @@ void buttons(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
-void idle(void)
+void button_up(unsigned char key, int x, int y)
 {
-    if (glutGetWindow() != window) glutSetWindow(window);
+    switch (key)
+    {
+        case 'w': g.keys.w = false; break;
+        case 's': g.keys.s = false; break;
+    }
 
     glutPostRedisplay();
 }
@@ -259,23 +255,35 @@ void look(int x, int y)
     if (x != center_x || y != center_y) glutWarpPointer(center_x, center_y);
 
     // Alter the player's look angle based on mouse x movement
-    int dx = x - center_x;
-    int d_angle = 0;
-    if (dx > 0) d_angle = std::max(1, dx / 25);
-    if (dx < 0) d_angle = std::min(-1, dx / 25);
-
-    p.angle = clamp_to_unit_circle(p.angle - d_angle);
+    int delta_x = x - center_x;
+    g.mouse_look(delta_x, delta_time);
 
     glutPostRedisplay();
 }
 
 void display()
 {
+    // Update delta time to get consistent game speed
+    time_since_frame = glutGet(GLUT_ELAPSED_TIME);
+    delta_time = time_since_frame - old_time_since_frame;
+    old_time_since_frame = time_since_frame;
+
+    g.keys_handler(delta_time);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     draw_scene();
 
     glutSwapBuffers();
+}
+
+void init()
+{
+    if (glutGetWindow() != window_id) glutSetWindow(window_id);
+
+    glClearColor(0.25, 0.25, 0.25, 0);
+    gluOrtho2D(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
+    glutSetCursor(GLUT_CURSOR_NONE);
 }
 
 int main(int argc, char* argv[])
@@ -285,13 +293,12 @@ int main(int argc, char* argv[])
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     glutCreateWindow("Ray Caster");
 
-    glClearColor(0.25, 0.25, 0.25, 0);
-    gluOrtho2D(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-    glutSetCursor(GLUT_CURSOR_NONE);
+    init();
 
-    glutIdleFunc(idle);
     glutDisplayFunc(display);
-    glutKeyboardFunc(buttons);
+    glutKeyboardFunc(button_down);
+    glutKeyboardUpFunc(button_up);
     glutPassiveMotionFunc(look);
+
     glutMainLoop();
 }

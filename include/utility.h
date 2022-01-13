@@ -32,7 +32,7 @@ const double infinity = std::numeric_limits<double>::infinity();
 const double epsilon = 0.0000000001;
 const double pi = 3.1415926535897932385;
 
-// // Functions
+// Utility functions
 inline double degrees_to_radians(double degrees) { return (degrees * pi) / 180.0; }
 
 inline double clamp_to_unit_circle(double degrees)
@@ -42,4 +42,5 @@ inline double clamp_to_unit_circle(double degrees)
 
     return degrees;
 }
+
 #endif  // UTILITY_H
