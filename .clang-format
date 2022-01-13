@@ -4,6 +4,7 @@ BasedOnStyle: Google
 UseTab: Never
 IndentWidth: 4
 BreakBeforeBraces: Allman
-AllowShortIfStatementsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
 ColumnLimit: 100

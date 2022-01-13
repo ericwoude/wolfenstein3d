@@ -1,8 +1,14 @@
 
 
-# C++ template
+# Ray Caster
 
-A basic C++ project template with CMake and GoogleTest.
+A reimpementation of the renderer of Wolfenstein3D.
+
+## Requirements
+This project requires an installation of OpenGL and GLUT. The following command can be used to install the dependences on a debian based system:
+```bash
+$ sudo apt install libglu1-mesa-dev freeglut3-dev mesa-common-dev
+```
 
 ## Usage
 
@@ -16,8 +22,3 @@ $ cmake -B build
 $ cmake --build build
 ```
 The compiled executables will be placed in build/bin.
-
-3. Test the project
-```bash
-$ cd build && ctest 
-```
