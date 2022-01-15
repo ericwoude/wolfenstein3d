@@ -30,11 +30,12 @@
 #include "game.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// DEFINITIONS
+// CONSTANTS AND DECLARATIONS
 ///////////////////////////////////////////////////////////////////////////////
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 400
+const int SCREEN_WIDTH = 960;
+const int SCREEN_HEIGHT = 640;
+const int FOV = 2 * atan(0.60);
 
 ///////////////////////////////////////////////////////////////////////////////
 // VARIABLES
@@ -50,6 +51,57 @@ const int window_id = 1;
 ///////////////////////////////////////////////////////////////////////////////
 // DRAWING FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////
+
+void draw_crosshair()
+{
+    constexpr int center_x = SCREEN_WIDTH / 2;
+    constexpr int center_y = SCREEN_HEIGHT / 2;
+
+    glColor3f(1, 1, 1);
+    glLineWidth(1);
+
+    glBegin(GL_LINES);
+    glVertex2i(center_x - 15, center_y);  // Horizontal crosshair lines
+    glVertex2i(center_x - 5, center_y);
+    glVertex2i(center_x + 5, center_y);
+    glVertex2i(center_x + 15, center_y);
+
+    glVertex2i(center_x, center_y - 15);  // Vertical crosshair lines
+    glVertex2i(center_x, center_y - 5);
+    glVertex2i(center_x, center_y + 5);
+    glVertex2i(center_x, center_y + 15);
+    glEnd();
+}
+
+void draw_enemies()
+{
+    const double theta = degrees_to_radians(g.p.angle);
+
+    double rx, ry;
+    double wx, wy;
+
+    for (const auto& enemy : g.enemies)
+    {
+        // Enemy position relative to player
+        rx = enemy.x - g.p.x;
+        ry = enemy.y - g.p.y;
+
+        // Transformation matrix to compute world space coordinates
+        wx = cos(theta) * ry + sin(theta) * rx;
+        wy = -sin(theta) * ry + cos(theta) * rx;
+
+        // Transform world coordinates to screen space
+        wx = (wx * 108.0 / wy) + (120 / 2);
+        wy = (enemy.z * 108.0 / wy) + (80 / 2);
+
+        // Draw a circle representing an enemy
+        glPointSize(8);
+        glColor3f(1, 1, 1);
+        glBegin(GL_POINTS);
+        glVertex2i(wx * 8, wy * 8);
+        glEnd();
+    }
+}
 
 void draw_scene()
 {
@@ -273,6 +325,8 @@ void display()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     draw_scene();
+    draw_enemies();
+    draw_crosshair();
 
     glutSwapBuffers();
 }
@@ -294,6 +348,8 @@ int main(int argc, char* argv[])
     glutCreateWindow("Ray Caster");
 
     init();
+
+    g.add_enemy(200, 400, 20);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(button_down);

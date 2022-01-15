@@ -26,25 +26,28 @@
 #define GAME_H
 
 #include <cmath>
+#include <vector>
 
+#include "enemy.h"
 #include "level.h"
 #include "player.h"
 #include "utility.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// DEFINITIONS
+// CONSTANTS AND DECLARATIONS
 ///////////////////////////////////////////////////////////////////////////////
 
-#define MAP_WIDTH 8
-#define MAP_HEIGHT 8
-
-#define MAX_DEPTH std::max(MAP_WIDTH, MAP_HEIGHT)
+const int MAP_WIDTH = 8;
+const int MAP_HEIGHT = 8;
+const int MAX_DEPTH = std::max(MAP_WIDTH, MAP_HEIGHT);
 
 typedef struct
 {
-    bool w;
-    bool s;
+    bool w = false;
+    bool s = false;
 } key_states;
+
+using std::vector;
 
 ///////////////////////////////////////////////////////////////////////////////
 // VARIABLES
@@ -53,7 +56,7 @@ typedef struct
 class game
 {
    public:
-    game() : p(150, 150), world(MAP_WIDTH, MAP_HEIGHT) {}
+    game() : p(200, 400), world(MAP_WIDTH, MAP_HEIGHT) {}
 
     void mouse_look(int dx, double dt)
     {
@@ -86,9 +89,12 @@ class game
         }
     }
 
+    void add_enemy(double x, double y, double z) { enemies.push_back(enemy(x, y, z)); }
+
     key_states keys;
     player p;
     level world;
+    vector<enemy> enemies;
 };
 
 #endif  // GAME_H
