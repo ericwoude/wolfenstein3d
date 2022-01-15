@@ -78,7 +78,7 @@ void draw_enemies()
     const double theta = degrees_to_radians(g.p.angle);
 
     double rx, ry;
-    double wx, wy;
+    double sx, sy;
 
     for (const auto& enemy : g.enemies)
     {
@@ -87,19 +87,30 @@ void draw_enemies()
         ry = enemy.y - g.p.y;
 
         // Transformation matrix to compute world space coordinates
-        wx = cos(theta) * ry + sin(theta) * rx;
-        wy = -sin(theta) * ry + cos(theta) * rx;
+        double a = cos(theta) * ry + sin(theta) * rx;
+        double b = -sin(theta) * ry + cos(theta) * rx;
 
         // Transform world coordinates to screen space
-        wx = (wx * 108.0 / wy) + (120 / 2);
-        wy = (enemy.z * 108.0 / wy) + (80 / 2);
+        sx = (a * 108.0 / b) + (120 / 2);
+        sy = (enemy.z * 108.0 / b) + (80 / 2);
 
-        // Draw a circle representing an enemy
-        glPointSize(8);
-        glColor3f(1, 1, 1);
-        glBegin(GL_POINTS);
-        glVertex2i(wx * 8, wy * 8);
-        glEnd();
+        if (sx > 0 && sx < 120)
+        {
+            int scale = 32 * 80 / b;
+            glPointSize(8);
+            glColor3f(0, 1, 0);
+            glBegin(GL_POINTS);
+
+            for (int x = sx - scale / 2; x < sx + scale / 2; x++)
+            {
+                for (int y = 0; y < scale; y++)
+                {
+                    glVertex2i(x * 8, (sy - y) * 8);
+                }
+            }
+
+            glEnd();
+        }
     }
 }
 
@@ -349,7 +360,7 @@ int main(int argc, char* argv[])
 
     init();
 
-    g.add_enemy(200, 400, 20);
+    g.add_enemy(250, 400, 20);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(button_down);

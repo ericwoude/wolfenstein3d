@@ -37,8 +37,8 @@
 // CONSTANTS AND DECLARATIONS
 ///////////////////////////////////////////////////////////////////////////////
 
-const int MAP_WIDTH = 8;
-const int MAP_HEIGHT = 8;
+const int MAP_WIDTH = 12;
+const int MAP_HEIGHT = 12;
 const int MAX_DEPTH = std::max(MAP_WIDTH, MAP_HEIGHT);
 
 typedef struct
