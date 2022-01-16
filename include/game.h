@@ -70,22 +70,31 @@ class game
 
     void keys_handler(double dt)
     {
+        const double dx = cos(degrees_to_radians(p.angle));
+        const double dy = -sin(degrees_to_radians(p.angle));
+
+        const int ox = (dx < 0) ? -10 : 10;
+        const int oy = (dy < 0) ? -10 : 10;
+
+        const int mx = p.x / 64.0;
+        const int my = p.y / 64.0;
+
         if (keys.w)
         {
-            const double dx = cos(degrees_to_radians(p.angle));
-            const double dy = -sin(degrees_to_radians(p.angle));
+            int ipx_po = (p.x + ox) / 64.0;
+            int ipy_po = (p.y + oy) / 64.0;
 
-            p.x += 0.2 * dt * dx;
-            p.y += 0.2 * dt * dy;
+            if (world[my * MAP_WIDTH + ipx_po] == 0) p.x += 0.2 * dt * dx;
+            if (world[ipy_po * MAP_WIDTH + mx] == 0) p.y += 0.2 * dt * dy;
         }
 
         if (keys.s)
         {
-            const double dx = cos(degrees_to_radians(p.angle));
-            const double dy = -sin(degrees_to_radians(p.angle));
+            int ipx_no = (p.x - ox) / 64.0;
+            int ipy_no = (p.y - oy) / 64.0;
 
-            p.x -= 0.2 * dt * dx;
-            p.y -= 0.2 * dt * dy;
+            if (world[my * MAP_WIDTH + ipx_no] == 0) p.x -= 0.2 * dt * dx;
+            if (world[ipy_no * MAP_WIDTH + mx] == 0) p.y -= 0.2 * dt * dy;
         }
     }
 
