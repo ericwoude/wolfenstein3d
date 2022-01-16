@@ -103,15 +103,23 @@ void draw_enemies()
 
             for (int x = sx - scale / 2; x < sx + scale / 2; x++)
             {
-                for (int y = 0; y < scale; y++)
-                {
-                    glVertex2i(x * 8, (sy - y) * 8);
-                }
+                for (int y = 0; y < scale; y++) glVertex2i(x * 8, (sy - y) * 8);
             }
 
             glEnd();
         }
     }
+}
+
+void draw_floor()
+{
+    glColor3f(1, 1, 1);
+    glBegin(GL_QUADS);
+    glVertex2i(0, SCREEN_HEIGHT / 2);
+    glVertex2i(SCREEN_WIDTH, SCREEN_HEIGHT / 2);
+    glVertex2i(SCREEN_WIDTH, SCREEN_HEIGHT);
+    glVertex2i(0, SCREEN_HEIGHT);
+    glEnd();
 }
 
 void draw_scene()
@@ -132,7 +140,7 @@ void draw_scene()
     // Offset vector
     double ox, oy;
 
-    for (int ray = 0; ray < 120; ray++)
+    for (int ray = 0; ray < 121; ray++)
     {
         double theta = degrees_to_radians(r_angle);
         double tangent = tan(theta);
@@ -261,8 +269,7 @@ void draw_scene()
 
         // Draw walls
         d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(pa - r_angle)));
-        int wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
-        wall_height = (wall_height > SCREEN_HEIGHT) ? SCREEN_HEIGHT : wall_height;
+        int wall_height = std::min((double)SCREEN_HEIGHT, (64 * SCREEN_HEIGHT) / d_horizontal);
         int offset = (SCREEN_HEIGHT / 2) - (wall_height >> 1);
 
         glLineWidth(8);
@@ -335,6 +342,7 @@ void display()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    draw_floor();
     draw_scene();
     draw_enemies();
     draw_crosshair();
