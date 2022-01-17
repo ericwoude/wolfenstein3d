@@ -24,6 +24,7 @@
 
 #include <GL/glut.h>
 
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <vector>
@@ -47,8 +48,8 @@ double old_time_since_frame;
 double time_since_frame;
 double delta_time;
 
-std::vector<texture> textures = {};
-
+std::vector<texture> textures;
+std::vector<int> depth_buffer = std::vector<int>(121, 0);
 game g;
 const int window_id = 1;
 
@@ -98,26 +99,48 @@ void draw_enemies()
         sx = (a * 108.0 / b) + (120 / 2);
         sy = (enemy.z * 108.0 / b) + (80 / 2);
 
-        if (sx > 0 && sx < 120)
-        {
-            int scale = 32 * 80 / b;
-            glPointSize(8);
-            glColor3f(0, 1, 0);
-            glBegin(GL_POINTS);
+        int scale = 32 * 80 / b;
+        scale = std::max(0, scale);
+        scale = std::min(120, scale);
 
+        glPointSize(8);
+        glBegin(GL_POINTS);
+
+        double tx = 0, ty = 31;
+        double tx_step = 32.0 / scale, ty_step = 32.0 / scale;
+
+        if (sx > 0 && sx < 120 && b < depth_buffer[(int)sx])
+        {
             for (int x = sx - scale / 2; x < sx + scale / 2; x++)
             {
-                for (int y = 0; y < scale; y++) glVertex2i(x * 8, (sy - y) * 8);
-            }
+                ty = 31;
+                for (int y = 0; y < scale; y++)
+                {
+                    int pixel = ((int)ty * 32 + (int)tx) * 3;
+                    int r = textures[1][pixel];
+                    int g = textures[1][pixel + 1];
+                    int b = textures[1][pixel + 2];
 
-            glEnd();
+                    if (r != 255 && g != 0 && b != 255)
+                    {
+                        glColor3ub(r, g, b);
+                        glVertex2i(x * 8, (sy - y) * 8);
+                    }
+
+                    ty = std::max(0.0, ty - ty_step);
+                }
+
+                tx += tx_step;
+            }
         }
+
+        glEnd();
     }
 }
 
 void draw_floor()
 {
-    glColor3f(1, 0, 1);
+    glColor3ub(65, 60, 40);
     glBegin(GL_QUADS);
     glVertex2i(0, SCREEN_HEIGHT / 2);
     glVertex2i(SCREEN_WIDTH, SCREEN_HEIGHT / 2);
@@ -277,7 +300,6 @@ void draw_scene()
 
         d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(pa - r_angle)));
         int wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
-
         double ty_step = 32.0 / (double)wall_height;
         double ty_offset = 0;
 
@@ -304,7 +326,7 @@ void draw_scene()
         }
 
         // Begin drawing
-
+        depth_buffer[ray] = d_horizontal;
         glPointSize(8);
         glBegin(GL_POINTS);
 
@@ -318,12 +340,6 @@ void draw_scene()
             glColor3ub(r, g, b);
 
             glVertex2i(ray * 8, y + offset);
-
-            // double c1, c2, c3;
-            // int tp = (int)(ty * 32 + tx);
-
-            // glColor3ub(wall[tp], wall[tp + 1], wall[tp + 2]);
-            // glVertex2i(ray * 8, y + offset);
 
             ty += ty_step;
         }
@@ -421,8 +437,9 @@ int main(int argc, char* argv[])
     init();
 
     textures.push_back(texture("wall.ppm"));
+    textures.push_back(texture("skull.ppm"));
 
-    g.add_enemy(250, 400, 20);
+    g.add_enemy(250, 400, 15);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(button_down);
