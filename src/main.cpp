@@ -26,8 +26,10 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #include "game.h"
+#include "texture.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // CONSTANTS AND DECLARATIONS
@@ -44,6 +46,8 @@ const int FOV = 2 * atan(0.60);
 double old_time_since_frame;
 double time_since_frame;
 double delta_time;
+
+std::vector<texture> textures = {};
 
 game g;
 const int window_id = 1;
@@ -113,7 +117,7 @@ void draw_enemies()
 
 void draw_floor()
 {
-    glColor3f(1, 1, 1);
+    glColor3f(1, 0, 1);
     glBegin(GL_QUADS);
     glVertex2i(0, SCREEN_HEIGHT / 2);
     glVertex2i(SCREEN_WIDTH, SCREEN_HEIGHT / 2);
@@ -124,6 +128,8 @@ void draw_floor()
 
 void draw_scene()
 {
+    int vmt = 0, hmt = 0;
+
     int depth;
     int pos;
 
@@ -184,10 +190,11 @@ void draw_scene()
             // Position relative to the grid
             pos = ((int)(vy) >> 6) * g.world.width + ((int)(vx) >> 6);
 
-            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] == 1)  // Hit
+            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] > 0)  // Hit
             {
                 depth = MAX_DEPTH;
                 d_vertical = cos(theta) * (vx - px) - sin(theta) * (vy - py);
+                vmt = g.world[pos] - 1;
             }
             else
             {
@@ -237,11 +244,11 @@ void draw_scene()
         {
             // Position relative to the grid
             pos = ((int)(hy) >> 6) * g.world.width + ((int)(hx) >> 6);
-
-            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] == 1)  // Hit
+            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] > 0)  // Hit
             {
                 depth = MAX_DEPTH;
                 d_horizontal = cos(theta) * (hx - px) - sin(theta) * (hy - py);
+                hmt = g.world[pos] - 1;
             }
             else
             {
@@ -250,6 +257,8 @@ void draw_scene()
                 depth += 1;
             }
         }
+
+        double shade = 1;
 
         /*
          * We take the ray with the shortest distance to draw the scene.
@@ -261,21 +270,64 @@ void draw_scene()
             hx = vx;
             hy = vy;
             d_horizontal = d_vertical;
-
-            glColor3f(0.9, 0, 0);
+            hmt = vmt;
         }
         else
-            glColor3f(0.7, 0, 0);
+            shade = 0.75;
 
-        // Draw walls
         d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(pa - r_angle)));
-        int wall_height = std::min((double)SCREEN_HEIGHT, (64 * SCREEN_HEIGHT) / d_horizontal);
+        int wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
+
+        double ty_step = 32.0 / (double)wall_height;
+        double ty_offset = 0;
+
+        if (wall_height > SCREEN_HEIGHT)
+        {
+            ty_offset = (wall_height - SCREEN_HEIGHT) / 2;
+            wall_height = SCREEN_HEIGHT;
+        }
+
         int offset = (SCREEN_HEIGHT / 2) - (wall_height >> 1);
 
-        glLineWidth(8);
-        glBegin(GL_LINES);
-        glVertex2i(ray * 8, offset);
-        glVertex2i(ray * 8, wall_height + offset);
+        double tx;
+        double ty = ty_offset * ty_step;
+
+        if (shade == 1)
+        {
+            tx = (int)(hy / 2) % 32;
+            if (g.p.angle > 90 && g.p.angle < 270) tx = 31 - tx;
+        }
+        else
+        {
+            tx = (int)(hx / 2) % 32;
+            if (g.p.angle > 180) tx = 31 - tx;
+        }
+
+        // Begin drawing
+
+        glPointSize(8);
+        glBegin(GL_POINTS);
+
+        for (int y = 0; y < wall_height; y++)
+        {
+            int pixel = ((int)ty * 32 + (int)tx) * 3;
+            int r = textures[hmt][pixel] * shade;
+            int g = textures[hmt][pixel + 1] * shade;
+            int b = textures[hmt][pixel + 2] * shade;
+
+            glColor3ub(r, g, b);
+
+            glVertex2i(ray * 8, y + offset);
+
+            // double c1, c2, c3;
+            // int tp = (int)(ty * 32 + tx);
+
+            // glColor3ub(wall[tp], wall[tp + 1], wall[tp + 2]);
+            // glVertex2i(ray * 8, y + offset);
+
+            ty += ty_step;
+        }
+
         glEnd();
 
         r_angle = clamp_to_unit_circle(r_angle - 0.5);
@@ -367,6 +419,8 @@ int main(int argc, char* argv[])
     glutCreateWindow("Ray Caster");
 
     init();
+
+    textures.push_back(texture("wall.ppm"));
 
     g.add_enemy(250, 400, 20);
 

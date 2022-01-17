@@ -32,7 +32,7 @@ using std::vector;
 class level
 {
    public:
-    level(int w, int h) : width(w), height(h) { initialize(); }
+    level(int w, int h) : width(w), height(h) {}
 
     int operator[](int i) const { return data[i]; }
     int &operator[](int i) { return data[i]; }
@@ -41,7 +41,13 @@ class level
     const int height;
 
    private:
-    vector<int> data;
+    vector<int> data = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+        1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0,
+        0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0,
+        0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    };
 
     // Initializes a level with borders (1's) and inside a big empty space (0's).
     void initialize()
