@@ -31,15 +31,14 @@
 // CONSTANTS
 ///////////////////////////////////////////////////////////////////////////////
 
-const double infinity = std::numeric_limits<double>::infinity();
-const double epsilon = 0.0000000001;
-const double pi = 3.1415926535897932385;
+const double EPSILON = 0.0000000001;
+const double PI = 3.1415926535897932385;
 
 ///////////////////////////////////////////////////////////////////////////////
 // UTILITY FUNTIONS
 ///////////////////////////////////////////////////////////////////////////////
 
-inline double degrees_to_radians(double degrees) { return (degrees * pi) / 180.0; }
+inline double degrees_to_radians(double degrees) { return (degrees * PI) / 180.0; }
 
 inline double clamp_to_unit_circle(double degrees)
 {

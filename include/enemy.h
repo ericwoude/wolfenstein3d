@@ -28,10 +28,18 @@
 class enemy
 {
    public:
-    enemy(double pos_x, double pos_y, double pos_z) : x(pos_x), y(pos_y), z(pos_z) {}
+    enemy(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
+
+    ~enemy() = default;
 
     double x;
     double y;
     double z;
 };
+
+class skull : public enemy
+{
+    skull(double x, double y, double z) : enemy{x, y, z} {}
+};
+
 #endif  // ENEMY_H

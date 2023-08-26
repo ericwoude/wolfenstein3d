@@ -88,8 +88,8 @@ void draw_enemies()
     for (const auto& enemy : g.enemies)
     {
         // Enemy position relative to player
-        rx = enemy.x - g.p.x;
-        ry = enemy.y - g.p.y;
+        rx = enemy->x - g.p.x;
+        ry = enemy->y - g.p.y;
 
         // Transformation matrix to compute world space coordinates
         double a = cos(theta) * ry + sin(theta) * rx;
@@ -97,7 +97,7 @@ void draw_enemies()
 
         // Transform world coordinates to screen space
         sx = (a * 108.0 / b) + (120 / 2);
-        sy = (enemy.z * 108.0 / b) + (80 / 2);
+        sy = (enemy->z * 108.0 / b) + (80 / 2);
 
         int scale = 32 * 80 / b;
         scale = std::max(0, scale);
@@ -182,9 +182,9 @@ void draw_scene()
          *    an upper bound of depth.
          */
         depth = 0;
-        d_vertical = infinity;
+        d_vertical = INFINITY;
 
-        if (cos(theta) > epsilon)  // Points left
+        if (cos(theta) > EPSILON)  // Points left
         {
             vx = (((int)px >> 6) << 6) + 64;
             vy = (px - vx) * tangent + py;
@@ -192,9 +192,9 @@ void draw_scene()
             ox = 64;
             oy = -64 * tangent;
         }
-        else if (cos(theta) < -epsilon)  // Points right
+        else if (cos(theta) < -EPSILON)  // Points right
         {
-            vx = (((int)px >> 6) << 6) - epsilon;
+            vx = (((int)px >> 6) << 6) - EPSILON;
             vy = (px - vx) * tangent + py;
 
             ox = -64;
@@ -237,17 +237,17 @@ void draw_scene()
          */
         tangent = 1.0 / tangent;
         depth = 0;
-        d_horizontal = infinity;
+        d_horizontal = INFINITY;
 
-        if (sin(theta) > epsilon)  // Points up
+        if (sin(theta) > EPSILON)  // Points up
         {
-            hy = (((int)py >> 6) << 6) - epsilon;
+            hy = (((int)py >> 6) << 6) - EPSILON;
             hx = (py - hy) * tangent + px;
 
             ox = 64 * tangent;
             oy = -64;
         }
-        else if (sin(theta) < -epsilon)  // Points down
+        else if (sin(theta) < -EPSILON)  // Points down
         {
             hy = (((int)py >> 6) << 6) + 64;
             hx = (py - hy) * tangent + px;
@@ -439,7 +439,7 @@ int main(int argc, char* argv[])
     textures.push_back(texture("wall.ppm"));
     textures.push_back(texture("skull.ppm"));
 
-    g.add_enemy(250, 400, 15);
+    g.add_enemy<skull>(250, 400, 15);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(button_down);

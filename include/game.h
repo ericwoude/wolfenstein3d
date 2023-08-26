@@ -26,6 +26,7 @@
 #define GAME_H
 
 #include <cmath>
+#include <memory>
 #include <vector>
 
 #include "enemy.h"
@@ -46,8 +47,6 @@ typedef struct
     bool w = false;
     bool s = false;
 } key_states;
-
-using std::vector;
 
 ///////////////////////////////////////////////////////////////////////////////
 // VARIABLES
@@ -98,12 +97,17 @@ class game
         }
     }
 
-    void add_enemy(double x, double y, double z) { enemies.push_back(enemy(x, y, z)); }
+    template <typename enemy_type>
+    requires std::derived_from<enemy_type, enemy>
+    void add_enemy(double x, double y, double z)
+    {
+        enemies.push_back(std::make_unique<enemy>(x, y, z));
+    }
 
     key_states keys;
     player p;
     level world;
-    vector<enemy> enemies;
+    std::vector<std::unique_ptr<enemy>> enemies;
 };
 
 #endif  // GAME_H
