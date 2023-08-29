@@ -7,21 +7,16 @@
 #include <iterator>
 #include <string>
 
-using std::cout;
-using std::ifstream;
-using std::string;
-using std::vector;
-
-class texture
+class Texture
 {
    public:
-    texture(string name) { load(name); }
+    Texture(std::string name) { load(name); }
 
     int operator[](int i) const { return data[i]; }
     int& operator[](int i) { return data[i]; }
 
    private:
-    vector<int> data;
+    std::vector<int> data;
 
     /*
      * This statemachine loads PPM files.
@@ -33,13 +28,13 @@ class texture
      * In case of violation of these properties, the program
      * states the problem and exits.
      */
-    void load(string name)  // clang-format off
+    void load(std::string name)  // clang-format off
     {
-        ifstream file("textures/" + name);
-        string s;
+        std::ifstream file("textures/" + name);
+        std::string s;
         int line = 0;
 
-        while (getline(file, s))
+        while (std::getline(file, s))
         {
             switch (line)
             {
@@ -50,7 +45,7 @@ class texture
                 
                 error: default:
                 {
-                    cout << "Problem loading " + name + ":" << s << '\n';
+                    std::cout << "Problem loading " + name + ":" << s << std::endl;
                     exit(0);
                 }
             }

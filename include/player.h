@@ -25,10 +25,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-class player
+class Player
 {
    public:
-    player(double x_pos, double y_pos) : x(x_pos), y(y_pos) {}
+    Player(double x_pos, double y_pos) : x(x_pos), y(y_pos) {}
 
     double x;
     double y;

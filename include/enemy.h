@@ -25,21 +25,21 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-class enemy
+class Enemy
 {
    public:
-    enemy(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
+    Enemy(double _x, double _y, double _z) : x(_x), y(_y), z(_z) {}
 
-    ~enemy() = default;
+    ~Enemy() = default;
 
     double x;
     double y;
     double z;
 };
 
-class skull : public enemy
+class Skull : public Enemy
 {
-    skull(double x, double y, double z) : enemy{x, y, z} {}
+    Skull(double x, double y, double z) : Enemy{x, y, z} {}
 };
 
 #endif  // ENEMY_H

@@ -27,12 +27,10 @@
 
 #include <vector>
 
-using std::vector;
-
-class level
+class Level
 {
    public:
-    level(int w, int h) : width(w), height(h) {}
+    Level(int w, int h) : width(w), height(h) {}
 
     int operator[](int i) const { return data[i]; }
     int &operator[](int i) { return data[i]; }
@@ -41,7 +39,7 @@ class level
     const int height;
 
    private:
-    vector<int> data = {
+    std::vector<int> data = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
         1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0,
         0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,

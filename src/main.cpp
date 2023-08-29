@@ -48,9 +48,9 @@ double old_time_since_frame;
 double time_since_frame;
 double delta_time;
 
-std::vector<texture> textures;
+std::vector<Texture> textures;
 std::vector<int> depth_buffer = std::vector<int>(121, 0);
-game g;
+Game game;
 const int window_id = 1;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,16 +80,16 @@ void draw_crosshair()
 
 void draw_enemies()
 {
-    const double theta = degrees_to_radians(g.p.angle);
+    const double theta = degrees_to_radians(game.player.angle);
 
     double rx, ry;
     double sx, sy;
 
-    for (const auto& enemy : g.enemies)
+    for (const auto& enemy : game.enemies)
     {
         // Enemy position relative to player
-        rx = enemy->x - g.p.x;
-        ry = enemy->y - g.p.y;
+        rx = enemy->x - game.player.x;
+        ry = enemy->y - game.player.y;
 
         // Transformation matrix to compute world space coordinates
         double a = cos(theta) * ry + sin(theta) * rx;
@@ -156,8 +156,8 @@ void draw_scene()
     int depth;
     int pos;
 
-    double px = g.p.x, py = g.p.y;
-    double pa = g.p.angle;
+    double px = game.player.x, py = game.player.y;
+    double pa = game.player.angle;
 
     double d_vertical, d_horizontal;
     double r_angle = clamp_to_unit_circle(pa + 30);
@@ -211,13 +211,14 @@ void draw_scene()
         while (depth < MAX_DEPTH)
         {
             // Position relative to the grid
-            pos = ((int)(vy) >> 6) * g.world.width + ((int)(vx) >> 6);
+            pos = ((int)(vy) >> 6) * game.level.width + ((int)(vx) >> 6);
 
-            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] > 0)  // Hit
+            if (pos > 0 && pos < game.level.width * game.level.height &&
+                game.level[pos] > 0)  // Hit
             {
                 depth = MAX_DEPTH;
                 d_vertical = cos(theta) * (vx - px) - sin(theta) * (vy - py);
-                vmt = g.world[pos] - 1;
+                vmt = game.level[pos] - 1;
             }
             else
             {
@@ -266,12 +267,13 @@ void draw_scene()
         while (depth < MAX_DEPTH)
         {
             // Position relative to the grid
-            pos = ((int)(hy) >> 6) * g.world.width + ((int)(hx) >> 6);
-            if (pos > 0 && pos < g.world.width * g.world.height && g.world[pos] > 0)  // Hit
+            pos = ((int)(hy) >> 6) * game.level.width + ((int)(hx) >> 6);
+            if (pos > 0 && pos < game.level.width * game.level.height &&
+                game.level[pos] > 0)  // Hit
             {
                 depth = MAX_DEPTH;
                 d_horizontal = cos(theta) * (hx - px) - sin(theta) * (hy - py);
-                hmt = g.world[pos] - 1;
+                hmt = game.level[pos] - 1;
             }
             else
             {
@@ -317,12 +319,12 @@ void draw_scene()
         if (shade == 1)
         {
             tx = (int)(hy / 2) % 32;
-            if (g.p.angle > 90 && g.p.angle < 270) tx = 31 - tx;
+            if (game.player.angle > 90 && game.player.angle < 270) tx = 31 - tx;
         }
         else
         {
             tx = (int)(hx / 2) % 32;
-            if (g.p.angle > 180) tx = 31 - tx;
+            if (game.player.angle > 180) tx = 31 - tx;
         }
 
         // Begin drawing
@@ -360,8 +362,8 @@ void button_down(unsigned char key, int x, int y)
 {
     switch (key)
     {
-        case 'w': g.keys.w = true; break;
-        case 's': g.keys.s = true; break;
+        case 'w': game.keys.w = true; break;
+        case 's': game.keys.s = true; break;
         case 27:
         {
             glutDestroyWindow(window_id);
@@ -377,8 +379,8 @@ void button_up(unsigned char key, int x, int y)
 {
     switch (key)
     {
-        case 'w': g.keys.w = false; break;
-        case 's': g.keys.s = false; break;
+        case 'w': game.keys.w = false; break;
+        case 's': game.keys.s = false; break;
     }
 
     glutPostRedisplay();
@@ -394,7 +396,7 @@ void look(int x, int y)
 
     // Alter the player's look angle based on mouse x movement
     int delta_x = x - center_x;
-    g.mouse_look(delta_x, delta_time);
+    game.mouse_look(delta_x, delta_time);
 
     glutPostRedisplay();
 }
@@ -406,7 +408,7 @@ void display()
     delta_time = time_since_frame - old_time_since_frame;
     old_time_since_frame = time_since_frame;
 
-    g.keys_handler(delta_time);
+    game.keys_handler(delta_time);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -436,10 +438,10 @@ int main(int argc, char* argv[])
 
     init();
 
-    textures.push_back(texture("wall.ppm"));
-    textures.push_back(texture("skull.ppm"));
+    textures.push_back(Texture("wall.ppm"));
+    textures.push_back(Texture("skull.ppm"));
 
-    g.add_enemy<skull>(250, 400, 15);
+    game.add_enemy<Skull>(250, 400, 15);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(button_down);
