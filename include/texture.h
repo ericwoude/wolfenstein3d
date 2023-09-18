@@ -3,8 +3,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <iostream>
-#include <iterator>
 #include <string>
 
 class Texture
@@ -12,11 +10,11 @@ class Texture
    public:
     Texture(std::string name) { load(name); }
 
-    int operator[](int i) const { return data[i]; }
-    int& operator[](int i) { return data[i]; }
+    uint8_t operator[](int i) const { return data[i]; }
+    uint8_t& operator[](int i) { return data[i]; }
 
    private:
-    std::vector<int> data;
+    std::vector<uint8_t> data;
 
     /*
      * This statemachine loads PPM files.
@@ -30,7 +28,7 @@ class Texture
      */
     void load(std::string name)  // clang-format off
     {
-        std::ifstream file("textures/" + name);
+        std::ifstream file("data/textures/" + name);
         std::string s;
         int line = 0;
 
@@ -41,7 +39,7 @@ class Texture
                 case 0: if (s != "P6")    goto error; break;
                 case 1: if (s != "32 32") goto error; break;
                 case 2: if (s != "255")   goto error; break;
-                case 3: for (const int c : s) data.push_back(c); break;
+                case 3: for (const uint8_t c : s) data.push_back(c); break;
                 
                 error: default:
                 {
