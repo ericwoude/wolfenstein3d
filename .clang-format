@@ -5,6 +5,8 @@ UseTab: Never
 IndentWidth: 4
 BreakBeforeBraces: Allman
 AllowShortIfStatementsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
+PackConstructorInitializers: Never
+PointerAlignment: Left
 ColumnLimit: 100

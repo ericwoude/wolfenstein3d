@@ -13,11 +13,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
-include_directories(include ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
+include_directories(include include/engine ${OPENGL_INCLUDE_DIRS} ${GLUT_INCLUDE_DIRS})
+
+file(GLOB_RECURSE SOURCES src/*.cpp)
 
 add_executable(
     raycaster
-    src/main.cpp
+    ${SOURCES}
 )
 
 target_link_libraries(raycaster ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})

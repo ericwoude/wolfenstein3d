@@ -1,0 +1,31 @@
+#ifndef UTILITY_H
+#define UTILITY_H
+
+namespace Engine
+{
+///////////////////////////////////////////////////////////////////////////////
+// CONSTANTS
+///////////////////////////////////////////////////////////////////////////////
+
+const double EPSILON = 0.0000000001;
+const double PI = 3.1415926535897932385;
+
+///////////////////////////////////////////////////////////////////////////////
+// UTILITY FUNTIONS
+///////////////////////////////////////////////////////////////////////////////
+
+inline double degrees_to_radians(double degrees)
+{
+    return (degrees * PI) / 180.0;
+}
+
+inline double clamp_to_unit_circle(double degrees)
+{
+    if (degrees > 359) degrees -= 360;
+    if (degrees < 0) degrees += 360;
+
+    return degrees;
+}
+}  // namespace Engine
+
+#endif  // UTILITY_H
