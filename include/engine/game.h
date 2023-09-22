@@ -23,7 +23,9 @@ const int MAX_DEPTH = std::max(MAP_WIDTH, MAP_HEIGHT);
 typedef struct
 {
     bool w = false;
+    bool a = false;
     bool s = false;
+    bool d = false;
 } key_states;
 
 ///////////////////////////////////////////////////////////////////////////////

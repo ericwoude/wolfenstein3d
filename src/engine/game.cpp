@@ -6,8 +6,8 @@ void Game::mouse_look(int dx, double dt)
 {
     int d_angle = 0;
 
-    if (dx > 0) d_angle = std::max(1, (int)(dx / 25 * 0.2 * dt));
-    if (dx < 0) d_angle = std::min(-1, (int)(dx / 25 * 0.2 * dt));
+    if (dx > 0) d_angle = std::max(1, static_cast<int>(dx / 25 * 0.2 * dt));
+    if (dx < 0) d_angle = std::min(-1, static_cast<int>(dx / 25 * 0.2 * dt));
 
     player.angle = clamp_to_unit_circle(player.angle - d_angle);
 }
@@ -39,6 +39,16 @@ void Engine::Game::keys_handler(double dt)
 
         if (level[my * MAP_WIDTH + ipx_no] == 0) player.x -= 0.2 * dt * dx;
         if (level[ipy_no * MAP_WIDTH + mx] == 0) player.y -= 0.2 * dt * dy;
+    }
+
+    if (keys.a)
+    {
+        player.angle = clamp_to_unit_circle(player.angle + dt / 6);
+    }
+
+    if (keys.d)
+    {
+        player.angle = clamp_to_unit_circle(player.angle - dt / 6);
     }
 }
 }  // namespace Engine
