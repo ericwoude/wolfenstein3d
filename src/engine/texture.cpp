@@ -40,9 +40,9 @@ void Texture::load(std::string name)
             case 0: if (s != "P6")    goto error; break;
             case 1: if (s != "32 32") goto error; break;
             case 2: if (s != "255")   goto error; break;
-            case 3: for (const uint8_t c : s) data.push_back(c); break;
+            default: for (const uint8_t c : s) data.push_back(c); break;
             
-            error: default:
+            error:
             {
                 std::cout << "Problem loading " + name + ":" << s << std::endl;
                 exit(0);

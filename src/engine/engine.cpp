@@ -229,7 +229,7 @@ void render_scene()
     double vx, vy;
     double hx, hy;
 
-    for (int ray = 0; ray < 121; ++ray)
+    for (int ray = 0; ray < SCREEN_WIDTH; ++ray)
     {
         double theta = degrees_to_radians(r_angle);
         double tangent = tan(theta);
@@ -252,10 +252,13 @@ void render_scene()
             hmt = vmt;
         }
         else
-            shade = 0.75;
+            shade = 0.5;
 
         d_horizontal *= cos(degrees_to_radians(clamp_to_unit_circle(pa - r_angle)));
-        int wall_height = (64 * SCREEN_HEIGHT) / d_horizontal;
+        depth_buffer[ray] = d_horizontal;
+
+        int wall_height = (32 * SCREEN_HEIGHT) / d_horizontal;
+
         double ty_step = 32.0 / static_cast<double>(wall_height);
         double ty_offset = 0;
 
@@ -282,8 +285,7 @@ void render_scene()
         }
 
         // Begin drawing
-        depth_buffer[ray] = d_horizontal;
-        glPointSize(8);
+        glPointSize(1);
         glBegin(GL_POINTS);
 
         for (int y = 0; y < wall_height; ++y)
@@ -295,14 +297,13 @@ void render_scene()
 
             glColor3ub(r, g, b);
 
-            glVertex2i(ray * 8, y + offset);
+            glVertex2i(ray, y + offset);
 
             ty += ty_step;
         }
 
         glEnd();
-
-        r_angle = clamp_to_unit_circle(r_angle - 0.5);
+        r_angle = clamp_to_unit_circle(r_angle - 60.0 / SCREEN_WIDTH);
     }
 
     glutPostRedisplay();
@@ -374,6 +375,11 @@ void display()
     render_scene();
     render_enemies();
     render_crosshair();
+
+    int fps = static_cast<int>(1000.0 / delta_time);
+    const unsigned char* t = reinterpret_cast<const unsigned char*>(std::to_string(fps).c_str());
+    glRasterPos2i(5, 20);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, t);
 
     glutSwapBuffers();
 }

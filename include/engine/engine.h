@@ -1,6 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <GL/freeglut.h>
 #include <GL/glut.h>
 
 #include <array>
@@ -30,7 +31,7 @@ inline double time_since_frame = 0;
 inline double delta_time = 0;
 
 inline std::vector<Texture> textures;
-inline std::vector<int> depth_buffer = std::vector<int>(121, 0);
+inline std::vector<int> depth_buffer = std::vector<int>(SCREEN_WIDTH, 0);
 const int window_id = 1;
 
 inline Game game{};
