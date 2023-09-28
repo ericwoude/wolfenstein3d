@@ -20,7 +20,8 @@ namespace Engine
 
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 640;
-const int FOV = 2 * atan(0.60);
+constexpr int RENDER_WIDTH = SCREEN_WIDTH / 2;
+constexpr int RENDER_HEIGHT = SCREEN_HEIGHT / 2;
 
 ///////////////////////////////////////////////////////////////////////////////
 // VARIABLES
@@ -35,6 +36,9 @@ inline std::vector<int> depth_buffer = std::vector<int>(SCREEN_WIDTH, 0);
 const int window_id = 1;
 
 inline Game game{};
+
+inline uint8_t pixel_buffer[RENDER_WIDTH * RENDER_HEIGHT * 3];  // 3 channels (RGB)
+inline GLuint texture_id;
 
 ///////////////////////////////////////////////////////////////////////////////
 // RENDER FUNCTIONS

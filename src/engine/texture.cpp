@@ -7,12 +7,12 @@ Texture::Texture(std::string name)
     load(name);
 }
 
-uint8_t Texture::operator[](int i) const
+uint32_t Texture::operator[](int i) const
 {
     return data[i];
 }
 
-uint8_t& Texture::operator[](int i)
+uint32_t& Texture::operator[](int i)
 {
     return data[i];
 }
@@ -21,7 +21,7 @@ uint8_t& Texture::operator[](int i)
  * This statemachine loads PPM files.
  * It ensures the following image properties:
  * - magic number P6
- * - 32 by 32 pixels
+ * - 64 by 64 pixels
  * - colours expressed in unsigned bytes (255)
  *
  * In case of violation of these properties, the program
@@ -38,10 +38,32 @@ void Texture::load(std::string name)
         switch (line)
         {
             case 0: if (s != "P6")    goto error; break;
-            case 1: if (s != "32 32") goto error; break;
+            case 1: if (s != "64 64") goto error; break;
             case 2: if (s != "255")   goto error; break;
-            default: for (const uint8_t c : s) data.push_back(c); break;
-            
+            default: {
+                int state = 0;
+                uint32_t color = 0;
+
+                for (const uint8_t c : s) {
+                    switch (state)
+                    {
+                        case 0: color |= (c << 16); break;  // red
+                        case 1: color |= (c << 8); break;   // green
+                        case 2:                             // blue
+                        {
+                            color |= c;
+                            data.push_back(color);
+                            
+                            color = 0;
+                            state = -1;
+                            break;
+                        }
+                    }
+
+                    state++;
+                }
+                break;
+            }
             error:
             {
                 std::cout << "Problem loading " + name + ":" << s << std::endl;

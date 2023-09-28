@@ -13,17 +13,17 @@ class Texture
    public:
     Texture(std::string name);
 
-    uint8_t operator[](int i) const;
-    uint8_t& operator[](int i);
+    uint32_t operator[](int i) const;
+    uint32_t& operator[](int i);
 
    private:
-    std::vector<uint8_t> data;
+    std::vector<uint32_t> data;
 
     /*
      * This statemachine loads PPM files.
      * It ensures the following image properties:
      * - magic number P6
-     * - 32 by 32 pixels
+     * - 64 by 64 pixels
      * - colours expressed in unsigned bytes (255)
      *
      * In case of violation of these properties, the program

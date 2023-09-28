@@ -36,7 +36,7 @@ class Game
 {
    public:
     Game()
-        : player{200, 400},
+        : player{220, 380},
           level{MAP_WIDTH, MAP_HEIGHT}
     {
     }
